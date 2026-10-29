@@ -1,0 +1,19 @@
+name: brazil_econ_bigquery
+version: '1.0.0'
+config-version: 2
+profile: brazil_econ_bigquery
+model-paths: [models]
+test-paths: [tests]
+macro-paths: [macros]
+clean-targets: [target, dbt_packages]
+models:
+  brazil_econ_bigquery:
+    +materialized: view
+    staging:
+      +schema: silver
+    intermediate:
+      +schema: silver
+    marts:
+      +schema: gold
+flags:
+  send_anonymous_usage_stats: false

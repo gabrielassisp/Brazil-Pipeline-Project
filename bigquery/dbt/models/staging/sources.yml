@@ -1,0 +1,7 @@
+version: 2
+sources:
+  - name: bronze
+    database: "{{ env_var('BQ_PROJECT') }}"
+    schema: "{{ env_var('BQ_DATASET_PREFIX', 'portfolio_econ') }}_{{ env_var('BQ_MODE', 'live') }}_bronze"
+    tables:
+      - name: observations

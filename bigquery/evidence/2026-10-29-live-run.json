@@ -1,0 +1,75 @@
+{
+  "run_id": "c958d24b30434b478bc01536e6bbeb3b",
+  "status": "success",
+  "mode": "live",
+  "start": "2022-01-01",
+  "end": "2024-12-31",
+  "started_at": "2026-10-29T22:40:33.081701+00:00",
+  "row_count": 75,
+  "sources": {
+    "ibge": 36,
+    "bcb": 36,
+    "worldbank": 3
+  },
+  "sha256": "a669db4f9c415f9ea60c0452fa2b1fc399b73fbd566c81248c6567ded0f8ec85",
+  "load": {
+    "job_id": "econ_c958d24b30434b478bc01536e6bbeb3b",
+    "output_rows": 75,
+    "input_bytes": 41187,
+    "destination": "gabriel-econ-bq-261029-8d72.portfolio_econ_live_bronze.observations",
+    "partition_field": "ingestion_date"
+  },
+  "query": {
+    "rows": [
+      {
+        "source": "bcb",
+        "indicator": "selic_annualized",
+        "frequency": "monthly",
+        "unit": "% a.a.",
+        "reference_date": "2024-12-01",
+        "value": 12.25,
+        "is_synthetic": false
+      },
+      {
+        "source": "ibge",
+        "indicator": "ipca_monthly",
+        "frequency": "monthly",
+        "unit": "%",
+        "reference_date": "2024-12-01",
+        "value": 0.52,
+        "is_synthetic": false
+      },
+      {
+        "source": "worldbank",
+        "indicator": "gdp_growth_annual",
+        "frequency": "annual",
+        "unit": "% a.a.",
+        "reference_date": "2024-01-01",
+        "value": 3.41931516501906,
+        "is_synthetic": false
+      }
+    ],
+    "job_id": "d55f3ac9-cf2a-46f8-8bf5-34dda757410e",
+    "total_bytes_processed": 4905,
+    "total_bytes_billed": 10485760
+  },
+  "finished_at": "2026-10-29T22:44:03.740811+00:00",
+  "elapsed_seconds": 210.659,
+  "local_unit_tests": {
+    "passed": 20,
+    "skipped": 0
+  },
+  "dbt_build": {
+    "models_success": 4,
+    "tests_passed": 16,
+    "errors": 0,
+    "elapsed_seconds": 9.416
+  },
+  "dbt_docs": {
+    "catalog_generated": true
+  },
+  "automation": {
+    "github_schedule_enabled": false,
+    "wif_validated": false
+  }
+}
