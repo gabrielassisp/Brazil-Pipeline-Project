@@ -1,0 +1,15 @@
+brazil_econ_bigquery:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: oauth
+      project: "{{ env_var('BQ_PROJECT') }}"
+      dataset: "{{ env_var('BQ_DATASET_PREFIX', 'portfolio_econ') }}_{{ env_var('BQ_MODE', 'live') }}_silver"
+      location: "{{ env_var('BQ_LOCATION', 'US') }}"
+      threads: 1
+      maximum_bytes_billed: "{{ env_var('BQ_MAX_BYTES_BILLED', '100000000') | int }}"
+      job_execution_timeout_seconds: 120
+      job_retries: 1
+      scopes:
+        - https://www.googleapis.com/auth/bigquery
