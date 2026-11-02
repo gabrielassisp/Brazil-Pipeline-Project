@@ -130,22 +130,16 @@ Abra `http://127.0.0.1:8081`. Os artefatos são gerados para a execução atual,
 - Uma thread dbt; retries e tempos de espera limitados; nenhuma coleta em loop infinito.
 - Confira cotas e jobs na console. Em projeto com faturamento habilitado, esses controles não garantem custo zero. Consulte [controle de custo de consultas](https://docs.cloud.google.com/bigquery/docs/best-practices-costs) e [restrições do Sandbox](https://docs.cloud.google.com/bigquery/docs/sandbox).
 
-## 7. Agendamento opcional sem chaves estáticas
+## 7. Agendamento sem chaves estáticas
 
-O workflow `bigquery-cloud.yml` está preparado para execução manual e agendamento diário às 11:00 UTC (08:00 em São Paulo, na configuração atual). O agendamento só executa a carga quando `BQ_ENABLE_SCHEDULE=true`. Não configure essa variável antes de validar uma execução manual e rever o consumo.
+O workflow `bigquery-cloud.yml` executa diariamente às **11:00 UTC (08:00 em São Paulo)**, aceita disparo manual e roda ao alterar o próprio workflow na main. Ele recarrega a janela histórica padrão **2022–2024**; não é um painel de indicadores de hoje.
 
-O workflow exige as variáveis do repositório:
+Os identificadores públicos do projeto dedicado, provider e conta de serviço estão explícitos no workflow. A autenticação usa federação OIDC e credenciais efêmeras; não há chave JSON nem senha Google em secrets. A confiança exige o ID numérico do repositório e do dono, branch main e o caminho exato deste workflow. Pull requests e outros workflows não satisfazem essa condição.
 
-| Variável | Uso |
-|---|---|
-| `BQ_PROJECT` | ID do projeto dedicado |
-| `BQ_LOCATION` | Mesma região dos datasets |
-| `GCP_WORKLOAD_IDENTITY_PROVIDER` | Provedor OIDC do GitHub |
-| `GCP_SERVICE_ACCOUNT` | Conta de serviço da demonstração |
-| `BQ_ENABLE_SCHEDULE` | `true` para ativar o agendamento |
+A conta `economic-pipeline` recebe Job User e Service Usage Consumer somente no projeto dedicado; WRITER (Data Editor) somente nos três datasets da demonstração. Não recebe Owner ou Editor no projeto inteiro. O script administrativo em `ops/configure_github_identity.py` registra a configuração reproduzível deste projeto; requer login administrativo e não faz parte do runtime do cron.
 
-Crie a federação seguindo a [documentação oficial da action](https://github.com/google-github-actions/auth). Restrinja a confiança ao repositório `gabrielassisp/Brazil-Pipeline-Project` e à branch `main`, e não a qualquer repositório GitHub. Faça o bootstrap com sua conta escolhida. Para executar, a conta de serviço precisa de `roles/bigquery.jobUser` no projeto e `roles/bigquery.dataEditor` somente nos três datasets da demonstração, além da autorização WIF de impersonação. Não conceda Owner ou Editor do projeto inteiro para o runtime.
+O resumo do Actions apresenta registros, modelos, testes, duração e load job. O artefato `bigquery-run-evidence` retém run.json, resultados e catálogo por sete dias, sem credenciais nem logs de depuração. A CI local continua separada da execução autenticada.
 
-O fluxo passa as credenciais efêmeras da action por ADC ao Python e ao perfil OAuth do dbt. A federação precisa ser validada no projeto real antes de anunciar o agendamento como operacional.
+A carga bem-sucedida renova a expiração da tabela Bronze. Falhas prolongadas ou cron desativado podem interromper essa renovação. GitHub Actions é um agendador de melhor esforço: pode atrasar ou descartar execuções sob carga e desativa cron em repositórios públicos sem atividade por 60 dias. Consulte a [documentação de execução agendada](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule) e [reativação de workflows](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/disable-and-enable-workflows).
 
-A CI sem cloud executa testes, extração fixture e `dbt parse` em pull requests. Esse parse verifica configuração e dependências; não valida permissões, faturamento, execução SQL no BigQuery ou autenticação WIF. Os artefatos de uma execução cloud são retidos por sete dias; logs de depuração e credenciais não são enviados como artefatos.
+O resultado da primeira execução federada deve ser confirmado no histórico Actions antes de anunciar operação automática validada.

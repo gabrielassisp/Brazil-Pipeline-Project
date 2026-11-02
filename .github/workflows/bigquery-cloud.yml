@@ -1,5 +1,8 @@
 name: Economic pipeline on BigQuery
 on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/bigquery-cloud.yml]
   workflow_dispatch:
     inputs:
       start:
@@ -20,15 +23,14 @@ concurrency:
   cancel-in-progress: false
 jobs:
   run:
-    if: github.event_name == 'workflow_dispatch' || vars.BQ_ENABLE_SCHEDULE == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     defaults:
       run:
         working-directory: bigquery
     env:
-      BQ_PROJECT: ${{ vars.BQ_PROJECT }}
-      BQ_LOCATION: ${{ vars.BQ_LOCATION || 'US' }}
+      BQ_PROJECT: gabriel-econ-bq-261029-8d72
+      BQ_LOCATION: US
       BQ_DATASET_PREFIX: portfolio_econ
       BQ_MAX_BYTES_BILLED: '100000000'
       BQ_MODE: live
@@ -39,8 +41,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Check required configuration
         env:
-          WIF_PROVIDER: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          SERVICE_ACCOUNT: ${{ vars.GCP_SERVICE_ACCOUNT }}
+          WIF_PROVIDER: projects/622896976570/locations/global/workloadIdentityPools/portfolio-github/providers/economic-pipeline
+          SERVICE_ACCOUNT: economic-pipeline@gabriel-econ-bq-261029-8d72.iam.gserviceaccount.com
         run: |
           test -n "$BQ_PROJECT" || { echo 'Configure BQ_PROJECT'; exit 1; }
           test -n "$WIF_PROVIDER" || { echo 'Configure GCP_WORKLOAD_IDENTITY_PROVIDER'; exit 1; }
@@ -50,11 +52,14 @@ jobs:
           python-version: '3.12'
       - uses: google-github-actions/auth@v3
         with:
-          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
-          project_id: ${{ vars.BQ_PROJECT }}
+          workload_identity_provider: projects/622896976570/locations/global/workloadIdentityPools/portfolio-github/providers/economic-pipeline
+          service_account: economic-pipeline@gabriel-econ-bq-261029-8d72.iam.gserviceaccount.com
+          project_id: gabriel-econ-bq-261029-8d72
       - run: python -m pip install -r requirements.txt
       - run: python -m economic_bq run --start "$START_DATE" --end "$END_DATE"
+      - name: Summarize execution
+        if: always()
+        run: python ops/summarize_run.py
       - name: Preserve execution evidence
         if: always()
         uses: actions/upload-artifact@v4
