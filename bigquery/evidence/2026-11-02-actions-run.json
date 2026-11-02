@@ -1,0 +1,21 @@
+{
+  "validated_on": "2026-11-02",
+  "status": "success",
+  "event": "push",
+  "workflow_run_url": "https://github.com/gabrielassisp/Brazil-Pipeline-Project/actions/runs/41384401185",
+  "workflow_run_id": 41384401185,
+  "commit": "39e6ae5b0850847e524bffb82ad1819cfd079c41",
+  "authentication": "GitHub OIDC Workload Identity Federation; no service-account key",
+  "rows": 75,
+  "dbt_models_success": 4,
+  "dbt_tests_passed": 16,
+  "dbt_build_summary": "PASS=20 WARN=0 ERROR=0 SKIP=0 NO-OP=0 TOTAL=20",
+  "cron": "0 11 * * *",
+  "schedule_sao_paulo": "08:00 daily",
+  "reference_window": [
+    "2022-01-01",
+    "2024-12-31"
+  ],
+  "scheduled_event_observed": false,
+  "note": "This validates an automatic push-triggered run. Future schedule events must be checked in Actions; cron is best effort."
+}

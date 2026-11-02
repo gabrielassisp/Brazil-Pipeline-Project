@@ -7,3 +7,5 @@ A publicação do workflow dispara uma execução de validação. Confira o resu
 `configure_github_identity.py` é um script administrativo idempotente e específico para este projeto. Requer login administrativo; não roda no cron. Ele recusa provider com condição diferente e datasets sem o rótulo da demonstração. Nunca cria chave JSON nem imprime tokens.
 
 `ops/summarize_run.py` produz o resumo da carga no Actions usando apenas os artefatos da execução.
+
+Validação federada concluída: https://github.com/gabrielassisp/Brazil-Pipeline-Project/actions/runs/41384401185 — 75 registros, quatro modelos e 16 testes dbt aprovados. Evento push; cron configurado, primeiro evento schedule ainda não observado.

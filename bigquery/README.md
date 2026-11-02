@@ -2,7 +2,7 @@
 
 Extensão independente da versão SQLite. Demonstra ingestão de APIs públicas, carga em lote no BigQuery, transformações dbt, testes, controle de consultas e evidências de execução. O código não utiliza a conta nem o projeto corporativo configurado no computador.
 
-**Status:** execução real validada no BigQuery em 29/10/2026: 75 observações públicas (36 IBGE, 36 BCB, 3 World Bank), quatro views e 16 testes dbt aprovados. Os 20 testes locais também passaram. Faturamento desativado no projeto dedicado; automação WIF/agendamento ainda não configurada. [Evidência da execução](evidence/2026-10-29-live-run.json).
+**Status:** execução real validada no BigQuery em 29/10/2026: 75 observações públicas (36 IBGE, 36 BCB, 3 World Bank), quatro views e 16 testes dbt aprovados. Os 20 testes locais também passaram. Faturamento desativado no projeto dedicado; federação WIF e cron diário configurados. A execução automática por push foi validada em 02/11/2026, com 75 registros, quatro modelos e 16 testes dbt aprovados. [Evidência Actions](evidence/2026-11-02-actions-run.json). [Evidência da execução](evidence/2026-10-29-live-run.json).
 
 A carga histórica 2022–2024 terminou em 210,659 segundos, incluindo extração, upload, dbt build, documentação e consulta final. A consulta final processou 4.905 bytes (mínimo contabilizado pelo job: 10 MiB); esse número não representa a soma dos jobs dbt nem cobrança monetária. Dados do Sandbox expiram, portanto esta evidência registra uma execução, não disponibilidade permanente das tabelas.
 
@@ -142,4 +142,4 @@ O resumo do Actions apresenta registros, modelos, testes, duração e load job. 
 
 A carga bem-sucedida renova a expiração da tabela Bronze. Falhas prolongadas ou cron desativado podem interromper essa renovação. GitHub Actions é um agendador de melhor esforço: pode atrasar ou descartar execuções sob carga e desativa cron em repositórios públicos sem atividade por 60 dias. Consulte a [documentação de execução agendada](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule) e [reativação de workflows](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/disable-and-enable-workflows).
 
-O resultado da primeira execução federada deve ser confirmado no histórico Actions antes de anunciar operação automática validada.
+A [execução federada de validação](https://github.com/gabrielassisp/Brazil-Pipeline-Project/actions/runs/41384401185) passou em 02/11/2026. Ela foi disparada automaticamente por push; isso não significa que já observamos uma execução do evento schedule. Acompanhe os próximos disparos no histórico Actions.
