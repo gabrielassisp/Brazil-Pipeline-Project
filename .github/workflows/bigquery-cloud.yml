@@ -15,7 +15,7 @@ on:
         required: true
   schedule:
     - cron: '0 11 * * *'
-    - cron: '20 15 2 11 *' # Temporary Nov 2 test at 12:20 Sao Paulo; remove after verification
+    - cron: '50 15 2 11 *' # Temporary Nov 2 test at 12:50 Sao Paulo; remove after verification
 permissions:
   contents: read
   id-token: write
