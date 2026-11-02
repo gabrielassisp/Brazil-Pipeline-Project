@@ -72,5 +72,6 @@ jobs:
             bigquery/output/**/observations.ndjson
             bigquery/output/**/dbt-target/manifest.json
             bigquery/output/**/dbt-target/run_results.json
+            bigquery/output/**/dbt-target/build_results.json
             bigquery/output/**/dbt-target/catalog.json
             bigquery/output/**/dbt-target/index.html

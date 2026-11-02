@@ -9,7 +9,8 @@ if not reports:
 else:
     report_path=max(reports,key=lambda p:p.stat().st_mtime)
     report=json.loads(report_path.read_text())
-    result_path=report_path.parent/'dbt-target/run_results.json'
+    result_path=report_path.parent/'dbt-target/build_results.json'
+    if not result_path.exists():result_path=report_path.parent/'dbt-target/run_results.json'
     results=json.loads(result_path.read_text()).get('results',[]) if result_path.exists() else []
     models=sum(x['unique_id'].startswith('model.') and x['status']=='success' for x in results)
     tests=sum(x['unique_id'].startswith('test.') and x['status']=='pass' for x in results)

@@ -4,6 +4,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import shutil
 import sys
 import time
 import uuid
@@ -73,6 +74,14 @@ def main(argv=None):
                 subprocess.run([executable,'--no-use-colors']+command.split()+flags+['--threads','1'],
                                env=dbt_env(config,args.start,args.end,rows[0]['ingestion_date']),check=True,
                                timeout=420 if command=='build' else 180)
+                if command == 'build':
+                    build_path = directory/'dbt-target/run_results.json'
+                    shutil.copyfile(build_path, directory/'dbt-target/build_results.json')
+                    results = json.loads(build_path.read_text(encoding='utf-8'))['results']
+                    report['dbt'] = dict(
+                        models_success=sum(r['unique_id'].startswith('model.') and r['status']=='success' for r in results),
+                        tests_passed=sum(r['unique_id'].startswith('test.') and r['status']=='pass' for r in results),
+                        errors=sum(r['status'] in ('error','fail') for r in results))
             report['query'] = warehouse.query_latest()
             report['status'] = 'success'
         else:
