@@ -1,0 +1,12 @@
+.venv/
+.gcloud-portfolio/
+**/__pycache__/
+**/.env
+**/output/
+**/target/
+**/logs/
+**/dbt_packages/
+gha-creds-*.json
+*credentials*.json
+*service-account*.json
+*.pyc

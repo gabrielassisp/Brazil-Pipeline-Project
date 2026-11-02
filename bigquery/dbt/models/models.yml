@@ -1,0 +1,33 @@
+version: 2
+models:
+  - name: stg_observations
+    description: Observações tipadas; dados anuais e mensais mantêm frequências separadas.
+    columns:
+      - name: observation_key
+        data_tests: [unique, not_null]
+      - name: reference_date
+        data_tests: [not_null]
+      - name: value
+        data_tests: [not_null]
+      - name: source
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [ibge, bcb, worldbank]
+      - name: frequency
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [monthly, annual]
+  - name: economic_trends
+    columns:
+      - name: observation_key
+        data_tests: [unique, not_null]
+  - name: latest_indicators
+    columns:
+      - name: source
+        data_tests: [unique, not_null]
+      - name: value
+        data_tests: [not_null]
+  - name: quality_summary
+    description: Cobertura por fonte, indicador e frequência do snapshot atual.

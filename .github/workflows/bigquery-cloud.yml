@@ -1,0 +1,71 @@
+name: Economic pipeline on BigQuery
+on:
+  workflow_dispatch:
+    inputs:
+      start:
+        description: First day of the first month
+        default: '2022-01-01'
+        required: true
+      end:
+        description: Last day of the last month
+        default: '2024-12-31'
+        required: true
+  schedule:
+    - cron: '0 11 * * *'
+permissions:
+  contents: read
+  id-token: write
+concurrency:
+  group: economic-bigquery-live
+  cancel-in-progress: false
+jobs:
+  run:
+    if: github.event_name == 'workflow_dispatch' || vars.BQ_ENABLE_SCHEDULE == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: bigquery
+    env:
+      BQ_PROJECT: ${{ vars.BQ_PROJECT }}
+      BQ_LOCATION: ${{ vars.BQ_LOCATION || 'US' }}
+      BQ_DATASET_PREFIX: portfolio_econ
+      BQ_MAX_BYTES_BILLED: '100000000'
+      BQ_MODE: live
+      DBT_SEND_ANONYMOUS_USAGE_STATS: 'false'
+      START_DATE: ${{ inputs.start || '2022-01-01' }}
+      END_DATE: ${{ inputs.end || '2024-12-31' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check required configuration
+        env:
+          WIF_PROVIDER: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          SERVICE_ACCOUNT: ${{ vars.GCP_SERVICE_ACCOUNT }}
+        run: |
+          test -n "$BQ_PROJECT" || { echo 'Configure BQ_PROJECT'; exit 1; }
+          test -n "$WIF_PROVIDER" || { echo 'Configure GCP_WORKLOAD_IDENTITY_PROVIDER'; exit 1; }
+          test -n "$SERVICE_ACCOUNT" || { echo 'Configure GCP_SERVICE_ACCOUNT'; exit 1; }
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+          project_id: ${{ vars.BQ_PROJECT }}
+      - run: python -m pip install -r requirements.txt
+      - run: python -m economic_bq run --start "$START_DATE" --end "$END_DATE"
+      - name: Preserve execution evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bigquery-run-evidence
+          retention-days: 7
+          if-no-files-found: ignore
+          path: |
+            bigquery/output/**/run.json
+            bigquery/output/**/observations.ndjson
+            bigquery/output/**/dbt-target/manifest.json
+            bigquery/output/**/dbt-target/run_results.json
+            bigquery/output/**/dbt-target/catalog.json
+            bigquery/output/**/dbt-target/index.html
